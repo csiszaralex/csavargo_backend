@@ -1,5 +1,4 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-// import { User } from '../entities/user.entity';
 import { Csoport } from '@prisma/client';
 
 export const GetId = createParamDecorator((_, ctx: ExecutionContext): number => {
