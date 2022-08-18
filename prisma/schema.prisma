@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Csoport {
+  id        Int         @id @default(autoincrement())
+  oztaly    String
+  csoport   Int
+  kod       String      @unique
+  QrCsoport QrCsoport[]
+}
+
+model Qr {
+  id          Int         @id @default(autoincrement())
+  kod         String      @unique
+  ertek       Int         @default(1)
+  hasznalhato Int         @default(1)
+  lat         Decimal     @default(0.0)
+  lng         Decimal     @default(0.0)
+  QrCsoport   QrCsoport[]
+}
+
+model QrCsoport {
+  id        Int      @id @default(autoincrement())
+  qrId      Int
+  qr        Qr       @relation(fields: [qrId], references: [id])
+  csoportId Int
+  csoport   Csoport  @relation(fields: [csoportId], references: [id])
+  mikor     DateTime @default(now())
+}
