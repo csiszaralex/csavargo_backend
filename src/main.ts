@@ -8,17 +8,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('START');
   const configService = app.get(ConfigService);
+  const PORT = configService.get('PORT') || 3000;
   const swaggerConf = new DocumentBuilder()
-    .setTitle(process.env.SWAGGER_NAME || '')
-    .setDescription(process.env.SWAGGER_DESC || '')
-    .setVersion(process.env.npm_package_version)
+    .setTitle(configService.get('SWAGGER_NAME') || '')
+    .setDescription(configService.get('SWAGGER_DESC') || '')
+    .setVersion(configService.get('npm_package_version'))
     .build();
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConf);
   SwaggerModule.setup(process.env.SWAGGER_LINK || 'api', app, swaggerDoc);
 
   app.enableCors({ origin: process.env.CORS || '*' });
-  await app.listen(configService.get('PORT') || 3000, () => {
-    logger.debug('-----------------------');
+  await app.listen(PORT, () => {
+    logger.debug(`---------- Server started on port ${PORT} ----------`);
   });
 }
 
