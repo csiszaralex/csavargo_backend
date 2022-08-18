@@ -12,7 +12,7 @@ datasource db {
 
 model Csoport {
   id        Int         @id @default(autoincrement())
-  osztaly    String
+  osztaly   String
   csoport   Int
   kod       String      @unique
   enabled   Boolean     @default(true)
@@ -24,6 +24,7 @@ model Qr {
   kod         String      @unique
   ertek       Int         @default(1)
   hasznalhato Int         @default(1)
+  enabled     Boolean     @default(true)
   lat         Decimal     @default(0.0)
   lng         Decimal     @default(0.0)
   QrCsoport   QrCsoport[]
@@ -37,3 +38,6 @@ model QrCsoport {
   csoport   Csoport  @relation(fields: [csoportId], references: [id])
   mikor     DateTime @default(now())
 }
+
+//TODO feladatok
+//TODO comment QR-hez

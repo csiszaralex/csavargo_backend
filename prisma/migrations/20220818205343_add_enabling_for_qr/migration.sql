@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `qr` ADD COLUMN `enabled` BOOLEAN NOT NULL DEFAULT true;
