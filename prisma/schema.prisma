@@ -12,7 +12,7 @@ datasource db {
 
 model Csoport {
   id        Int         @id @default(autoincrement())
-  oztaly    String
+  osztaly    String
   csoport   Int
   kod       String      @unique
   enabled   Boolean     @default(true)
