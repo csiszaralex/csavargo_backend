@@ -4,7 +4,7 @@ import { SigninCsoportDto } from './dto/signin-csoport.dto';
 import { JwtPayloadInterface } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { SignInPayloadInterface } from './interfaces/signin-payload.interface';
-import { Csoport } from '@prisma/client';
+import { Csoport, Qr } from '@prisma/client';
 
 @Injectable()
 export class CsoportService {
@@ -40,5 +40,33 @@ export class CsoportService {
     await this.prisma.csoport.update({ data: { kod: code }, where: { id } });
     csoport = await this.prisma.csoport.findUnique({ where: { id } });
     return csoport;
+  }
+
+  async getQrs(id: number) {
+    const csoport = await this.prisma.csoport.findUnique({
+      where: { id },
+      include: { QrCsoport: true },
+    });
+    const qrs: Qr[] = [];
+    for (const i of csoport.QrCsoport) {
+      qrs.push(await this.prisma.qr.findUnique({ where: { id: i.qrId } }));
+    }
+
+    return qrs;
+  }
+
+  async getQrOsztaly(id: number) {
+    const csoport = await this.prisma.csoport.findUnique({ where: { id } });
+    const csoportok = await this.prisma.csoport.findMany({
+      where: { osztaly: csoport.osztaly },
+      include: { QrCsoport: true },
+    });
+    const qrs: Qr[] = [];
+    for (const i of csoportok) {
+      for (const j of i.QrCsoport) {
+        qrs.push(await this.prisma.qr.findUnique({ where: { id: j.qrId } }));
+      }
+    }
+    return qrs;
   }
 }

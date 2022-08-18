@@ -38,4 +38,16 @@ export class CsoportController {
   ): Promise<Csoport> {
     return this.csoportService.editPass(id, signinCsoportDto);
   }
+
+  @Get()
+  @UseGuards(AuthGuard())
+  getQrs(@GetId() id: number) {
+    return this.csoportService.getQrs(id);
+  }
+
+  @Get('osztaly')
+  @UseGuards(AuthGuard())
+  getQrOsztaly(@GetId() id: number) {
+    return this.csoportService.getQrOsztaly(id);
+  }
 }
