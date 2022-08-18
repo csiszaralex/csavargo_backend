@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards, Param, ParseIntPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AlexGuard } from 'src/guards/alex.guard';
+import { AlexGuard } from 'src/csoport/guards/alex.guard';
 import { CsoportService } from './csoport.service';
 import { GetId } from './decorators/get-id.decorator';
 import { SigninCsoportDto } from './dto/signin-csoport.dto';
