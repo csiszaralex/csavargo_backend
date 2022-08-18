@@ -15,6 +15,7 @@ model Csoport {
   oztaly    String
   csoport   Int
   kod       String      @unique
+  enabled   Boolean     @default(true)
   QrCsoport QrCsoport[]
 }
 
