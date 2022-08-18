@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { CsoportModule } from './csoport/csoport.module';
 import { QrModule } from './qr/qr.module';
+import { QrcsoportModule } from './qrcsoport/qrcsoport.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { QrModule } from './qr/qr.module';
     }),
     CsoportModule,
     QrModule,
+    QrcsoportModule,
   ],
   controllers: [AppController],
   providers: [],
