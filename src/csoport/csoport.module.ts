@@ -4,6 +4,7 @@ import { CsoportController } from './csoport.controller';
 import { PrismaService } from 'src/prisma.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   controllers: [CsoportController],
@@ -14,7 +15,7 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: process.env.EXPIRES_IN || '1h' },
     }),
   ],
-  providers: [CsoportService, PrismaService],
-  exports: [CsoportModule, JwtModule, PassportModule],
+  providers: [CsoportService, PrismaService, JwtStrategy],
+  exports: [CsoportModule, JwtStrategy, PassportModule],
 })
 export class CsoportModule {}

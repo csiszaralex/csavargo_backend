@@ -1,26 +1,25 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, ExtractJwt } from 'passport-jwt';
-import { JwtPayloadInterface } from '../interfaces/jwt-payload.interface';
-import { Csoport } from '@prisma/client';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from 'src/prisma.service';
+import { JwtPayloadInterface } from '../interfaces/jwt-payload.interface';
 
-@Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private prisma: PrismaService) {
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.SECRET || 'niszIsTheBest123',
+      secretOrKey: process.env.SECRET || 'secret',
     });
   }
 
   async validate(payload: JwtPayloadInterface): Promise<JwtPayloadInterface> {
+    const prisma = new PrismaService();
     const { id } = payload;
-    const csoport: Csoport = await this.prisma.csoport.findUnique({ where: { id } });
-    if (!csoport) {
-      throw new UnauthorizedException(`Nincs csoport a következő id-vel: ${id}`);
-    }
 
-    return { id: csoport.id, osztaly: csoport.osztaly, csoport: csoport.csoport };
+    const csoport = await prisma.csoport.findUnique({ where: { id } });
+
+    if (!csoport) throw new UnauthorizedException('Hibás csoport kód');
+    if (!csoport.enabled) throw new UnauthorizedException('A csoport belépése nem engedélyezett');
+    return payload;
   }
 }

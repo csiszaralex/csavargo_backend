@@ -22,19 +22,21 @@ export class CsoportService {
     return { accessToken };
   }
 
-  async whoami(id: number) {
-    return id;
+  async renew(id: number) {
+    const csoport = await this.prisma.csoport.findUnique({ where: { id } });
+    return this.signin({ code: csoport.kod });
   }
-  async renew() {
-    throw Error('Not implemented');
+  async disable(id: number) {
+    let csoport = await this.prisma.csoport.findUnique({ where: { id } });
+    await this.prisma.csoport.update({ data: { enabled: !csoport.enabled }, where: { id } });
+    csoport = await this.prisma.csoport.findUnique({ where: { id } });
+    return csoport;
   }
-  async signout() {
-    throw Error('Not implemented');
-  }
-  async disable() {
-    throw Error('Not implemented');
-  }
-  async editPass() {
-    throw Error('Not implemented');
+  async editPass(id: number, signinCsoportDto: SigninCsoportDto) {
+    const { code } = signinCsoportDto;
+    let csoport = await this.prisma.csoport.findUnique({ where: { id } });
+    await this.prisma.csoport.update({ data: { kod: code }, where: { id } });
+    csoport = await this.prisma.csoport.findUnique({ where: { id } });
+    return csoport;
   }
 }
