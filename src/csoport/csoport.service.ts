@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { SigninCsoportDto } from './dto/signin-csoport.dto';
 import { JwtPayloadInterface } from './interfaces/jwt-payload.interface';
@@ -13,8 +13,8 @@ export class CsoportService {
   async signin(signinCsoportDto: SigninCsoportDto): Promise<SignInPayloadInterface> {
     const { code } = signinCsoportDto;
     const csoport = await this.prisma.csoport.findUnique({ where: { kod: code } });
-    if (!csoport) throw new UnauthorizedException('Hibás csoport kód');
-    if (!csoport.enabled) throw new UnauthorizedException('A csoport belépése nem engedélyezett');
+    if (!csoport) throw new ForbiddenException('Hibás csoport kód');
+    if (!csoport.enabled) throw new ForbiddenException('A csoport belépése nem engedélyezett');
     const payload: JwtPayloadInterface = {
       id: csoport.id,
       osztaly: csoport.osztaly,
@@ -43,30 +43,42 @@ export class CsoportService {
   }
 
   async getQrs(id: number) {
-    const csoport = await this.prisma.csoport.findUnique({
-      where: { id },
-      include: { QrCsoport: true },
+    const qrs = [];
+
+    const QR_csopok = await this.prisma.qrCsoport.findMany({
+      where: { csoportId: id },
+      select: { qr: true, mikor: true },
     });
-    const qrs: Qr[] = [];
-    for (const i of csoport.QrCsoport) {
-      qrs.push(await this.prisma.qr.findUnique({ where: { id: i.qrId } }));
+    for (const i of QR_csopok) {
+      qrs.push({ Érték: i.qr.ertek, Mikor: i.mikor });
     }
 
     return qrs;
   }
 
   async getQrOsztaly(id: number) {
-    const csoport = await this.prisma.csoport.findUnique({ where: { id } });
-    const csoportok = await this.prisma.csoport.findMany({
-      where: { osztaly: csoport.osztaly },
-      include: { QrCsoport: true },
+    const qrs = [];
+
+    const { osztaly } = await this.prisma.csoport.findUnique({
+      where: { id },
+      select: { osztaly: true },
     });
-    const qrs: Qr[] = [];
-    for (const i of csoportok) {
-      for (const j of i.QrCsoport) {
-        qrs.push(await this.prisma.qr.findUnique({ where: { id: j.qrId } }));
+    const csoportok = await this.prisma.csoport.findMany({
+      where: { osztaly },
+      select: { id: true },
+    });
+    const csoportIdk = csoportok.map(({ id }) => id);
+
+    for (const csId of csoportIdk) {
+      const QR_csopok = await this.prisma.qrCsoport.findMany({
+        where: { csoportId: csId },
+        select: { qr: true, mikor: true, csoportId: true },
+      });
+      for (const i of QR_csopok) {
+        qrs.push({ Csoport: i.csoportId, Érték: i.qr.ertek, Mikor: i.mikor });
       }
     }
+
     return qrs;
   }
 }
