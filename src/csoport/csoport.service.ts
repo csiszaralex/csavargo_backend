@@ -4,7 +4,7 @@ import { SigninCsoportDto } from './dto/signin-csoport.dto';
 import { JwtPayloadInterface } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { SignInPayloadInterface } from './interfaces/signin-payload.interface';
-import { Csoport, Qr } from '@prisma/client';
+import { Csoport } from '@prisma/client';
 
 @Injectable()
 export class CsoportService {
