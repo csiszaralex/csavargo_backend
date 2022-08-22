@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { CsoportModule } from './csoport/csoport.module';
 import { QrModule } from './qr/qr.module';
 import { QrcsoportModule } from './qrcsoport/qrcsoport.module';
+import { FeladatModule } from './feladat/feladat.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { QrcsoportModule } from './qrcsoport/qrcsoport.module';
     CsoportModule,
     QrModule,
     QrcsoportModule,
+    FeladatModule,
   ],
   controllers: [AppController],
   providers: [],
