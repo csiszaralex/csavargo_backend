@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `feladat` ADD COLUMN `maxProba` INTEGER NOT NULL DEFAULT 3;

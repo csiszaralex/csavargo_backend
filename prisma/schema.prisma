@@ -17,6 +17,7 @@ model Csoport {
   kod       String      @unique
   enabled   Boolean     @default(true)
   QrCsoport QrCsoport[]
+  Proba     Proba[]
 }
 
 model Qr {
@@ -41,12 +42,25 @@ model QrCsoport {
 }
 
 model Feladat {
-  id       Int    @id @default(autoincrement())
-  feladat  String @unique
-  megoldas String @default("")
-  //? Segítség?
+  id       Int     @id @default(autoincrement())
+  feladat  String  @unique
+  megoldas String  @default("")
+  maxProba Int     @default(3)
   qrId     Int
-  qr       Qr     @relation(fields: [qrId], references: [id])
+  qr       Qr      @relation(fields: [qrId], references: [id])
+  proba    Proba[]
+}
+
+model Proba {
+  id         Int      @id @default(autoincrement())
+  proba      String
+  cleanProba String
+  mikor      DateTime @default(now())
+  elutasitva Boolean  @default(false)
+  csoportId  Int
+  csoport    Csoport  @relation(fields: [csoportId], references: [id])
+  feladatId  Int
+  feladat    Feladat  @relation(fields: [feladatId], references: [id])
 }
 
 //TODO feladatok
