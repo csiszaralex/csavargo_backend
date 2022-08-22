@@ -27,7 +27,10 @@ export class QrController {
 
   @UseGuards(JustAuthGuard)
   @Post('/available')
-  available(@Body() verifyQrDto: VerifyQrDto, @GetId() id: number): Promise<{ available: boolean; id: number }> {
+  available(
+    @Body() verifyQrDto: VerifyQrDto,
+    @GetId() id: number,
+  ): Promise<{ available: boolean; id: number }> {
     return this.qrService.available(verifyQrDto, id);
   }
 
