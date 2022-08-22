@@ -52,6 +52,7 @@ export class CsoportService {
     for (const i of QR_csopok) {
       qrs.push({ Érték: i.qr.ertek, Mikor: i.mikor });
     }
+    qrs.sort((a, b) => b.Mikor - a.Mikor);
 
     return qrs;
   }
@@ -75,9 +76,10 @@ export class CsoportService {
         select: { qr: true, mikor: true, csoportId: true },
       });
       for (const i of QR_csopok) {
-        qrs.push({ Csoport: i.csoportId, Érték: i.qr.ertek, Mikor: i.mikor });
+        qrs.push({ Csoport: i.csoportId - 1, Érték: i.qr.ertek, Mikor: i.mikor });
       }
     }
+    qrs.sort((a, b) => b.Mikor - a.Mikor);
 
     return qrs;
   }
