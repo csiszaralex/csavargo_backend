@@ -28,6 +28,7 @@ model Qr {
   lat         Decimal     @default(0.0)
   lng         Decimal     @default(0.0)
   QrCsoport   QrCsoport[]
+  Feladat     Feladat[]
 }
 
 model QrCsoport {
@@ -37,6 +38,15 @@ model QrCsoport {
   csoportId Int
   csoport   Csoport  @relation(fields: [csoportId], references: [id])
   mikor     DateTime @default(now())
+}
+
+model Feladat {
+  id       Int    @id @default(autoincrement())
+  feladat  String @unique
+  megoldas String @default("")
+  //? Segítség?
+  qrId     Int
+  qr       Qr     @relation(fields: [qrId], references: [id])
 }
 
 //TODO feladatok
