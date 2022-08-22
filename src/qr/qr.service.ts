@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Qr } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateQrDto } from './dto/create-qr.dto';
 import { UpdateQrPosDto } from './dto/update-qr-pos.dto';
+import { VerifyQrDto } from './dto/verify-qr.dto';
 
 @Injectable()
 export class QrService {
@@ -11,7 +12,7 @@ export class QrService {
   create(createQrDto: CreateQrDto): Promise<Qr> {
     const { ertek, hasznalhato, kod, lat, lng } = createQrDto;
     const QR = this.prisma.qr.findUnique({ where: { kod } });
-    if (QR) throw new BadRequestException('A QR kód már létezik');
+    if (QR) throw new NotFoundException('A QR kód már létezik');
     const qr = this.prisma.qr.create({
       data: { ertek: +ertek, hasznalhato: +hasznalhato, kod, lat, lng },
     });
@@ -24,8 +25,32 @@ export class QrService {
 
   findOne(id: number): Promise<Qr> {
     const qr = this.prisma.qr.findUnique({ where: { id } });
-    if (!qr) throw new BadRequestException('A QR kód nem létezik');
+    if (!qr) throw new NotFoundException('A QR kód nem létezik');
     return qr;
+  }
+
+  async available(
+    verifyQrDto: VerifyQrDto,
+    csopId: number,
+  ): Promise<{ available: boolean; id: number }> {
+    const { code } = verifyQrDto;
+    const qr = await this.prisma.qr.findUnique({
+      where: { kod: code },
+      select: { hasznalhato: true, id: true },
+    });
+    if (!qr) throw new NotFoundException('A QR kód nem létezik');
+    const { hasznalhato, id } = qr;
+    const hasznalt = await this.prisma.qrCsoport.findMany({ where: { qrId: id } });
+    const myCsop = await this.prisma.csoport.findUnique({ where: { id: csopId } });
+    for (const qrcsop of hasznalt) {
+      const csop = await this.prisma.csoport.findUnique({ where: { id: qrcsop.csoportId } });
+      if (myCsop.osztaly === csop.osztaly)
+        throw new BadRequestException(
+          'Ezt a QR kódot Ti vagy az osztály másik része már megtalálta',
+        );
+    }
+
+    return { available: hasznalhato > hasznalt.length, id: id };
   }
 
   async update(id: number, createQrDto: CreateQrDto): Promise<Qr> {
