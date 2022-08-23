@@ -28,6 +28,7 @@ model Qr {
   enabled     Boolean     @default(true)
   lat         Decimal     @default(0.0)
   lng         Decimal     @default(0.0)
+  hely        String      @default("")
   QrCsoport   QrCsoport[]
   Feladat     Feladat[]
 }

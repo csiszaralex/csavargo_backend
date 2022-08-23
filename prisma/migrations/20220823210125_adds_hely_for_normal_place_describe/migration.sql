@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `qr` ADD COLUMN `hely` VARCHAR(191) NOT NULL DEFAULT '';
