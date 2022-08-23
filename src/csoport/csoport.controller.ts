@@ -50,4 +50,17 @@ export class CsoportController {
   getQrOsztaly(@GetId() id: number) {
     return this.csoportService.getQrOsztaly(id);
   }
+
+  @Get('stat')
+  @UseGuards(AlexGuard)
+  @UseGuards(AuthGuard())
+  getStat() {
+    return this.csoportService.getStat();
+  }
+  @Get('stat/osztaly')
+  @UseGuards(AlexGuard)
+  @UseGuards(AuthGuard())
+  getOsztalyStat() {
+    return this.csoportService.getOsztalyStat();
+  }
 }

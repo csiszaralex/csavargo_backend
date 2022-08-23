@@ -5,6 +5,7 @@ import { JwtPayloadInterface } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { SignInPayloadInterface } from './interfaces/signin-payload.interface';
 import { Csoport } from '@prisma/client';
+import internal from 'stream';
 
 @Injectable()
 export class CsoportService {
@@ -82,5 +83,41 @@ export class CsoportService {
     qrs.sort((a, b) => b.Mikor - a.Mikor);
 
     return qrs;
+  }
+
+  async getStat() {
+    const stat: { osztaly: string; csoport: number; kod: string; pont: number }[] = [];
+    const csoportok = await this.prisma.csoport.findMany({
+      where: { osztaly: { not: 'admin' } },
+      select: { id: true, osztaly: true, csoport: true, QrCsoport: true, kod: true },
+    });
+    for (const csoport of csoportok) {
+      let pont = 0;
+      const qrek = await this.prisma.qrCsoport.findMany({
+        where: { csoportId: csoport.id },
+        select: { qr: true },
+      });
+      for (const qr of qrek) {
+        pont += qr.qr.ertek;
+      }
+      stat.push({ osztaly: csoport.osztaly, csoport: csoport.csoport, kod: csoport.kod, pont });
+    }
+    stat.sort((a, b) => b.pont - a.pont);
+    return stat;
+  }
+  async getOsztalyStat() {
+    const stat = await this.getStat();
+    const osztalyok: { osztaly: string; pont: number }[] = [];
+
+    for (const csoport of stat) {
+      const osztaly = osztalyok.find(({ osztaly }) => osztaly === csoport.osztaly);
+      if (osztaly) {
+        osztaly.pont += csoport.pont;
+      } else {
+        osztalyok.push({ osztaly: csoport.osztaly, pont: csoport.pont });
+      }
+    }
+    osztalyok.sort((a, b) => b.pont - a.pont);
+    return osztalyok;
   }
 }
