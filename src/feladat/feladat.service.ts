@@ -10,13 +10,14 @@ export class FeladatService {
     const task = await this.getFeladat(id);
     const meg = await this.probaMeg(id, csopId);
 
-    const { feladat } = task;
-    return { feladat, meg };
+    const { feladat, type } = task;
+    return { feladat, meg, type };
   }
 
-  async try(tryFeladatDto: TryFeladatDto, id: number, csopId: number) {
+  async try(tryFeladatDto: TryFeladatDto, id: number, csopId: number, force = false) {
     const meg = await this.probaMeg(id, csopId);
-    if (meg === 0) throw new BadRequestException('Elérted a próbálkozások maximális számát!');
+    if (meg === 0 && !force)
+      throw new BadRequestException('Elérted a próbálkozások maximális számát!');
     const { answer } = tryFeladatDto;
     const clearedAnswer = answer
       .toLowerCase()
@@ -29,11 +30,12 @@ export class FeladatService {
       .replace('ő', 'o')
       .replace('ú', 'u')
       .replace('ü', 'u')
-      .replace('ű', 'u');
-
+      .replace('ű', 'u')
+      .replace(/[.,\-+*/?!'"=]/g, 'u');
     const task = await this.getFeladat(id);
-    if (task.megoldas === clearedAnswer) {
+    if (task.megoldas === clearedAnswer || force) {
       await this.prisma.qrCsoport.create({ data: { csoportId: csopId, qrId: task.qrId } });
+      await this.prisma.proba.deleteMany({ where: { csoportId: +csopId, feladatId: +id } });
       return { type: 'Siker' };
     }
     const voltmar =
@@ -62,5 +64,36 @@ export class FeladatService {
     const task = await this.prisma.feladat.findUnique({ where: { id: +id } });
     if (!task) throw new NotFoundException('Ilyen feladat nem létezik');
     return task;
+  }
+
+  async getAcceptable() {
+    const attempts = await this.prisma.proba.findMany({
+      where: { elutasitva: false },
+      select: { csoport: true, feladat: true, proba: true, mikor: true, id: true },
+    });
+    const cleanedAttempts = attempts.map(attempt => {
+      return {
+        kerdes: attempt.feladat.feladat,
+        megoldas: attempt.feladat.megoldas,
+        csoport: `${attempt.csoport.osztaly} / ${attempt.csoport.csoport}`,
+        proba: attempt.proba,
+        mikor: attempt.mikor,
+        felId: attempt.feladat.id,
+        csopId: attempt.csoport.id,
+        id: attempt.id,
+      };
+    });
+    return cleanedAttempts;
+  }
+  async accept(id: number) {
+    const proba = await this.prisma.proba.findUnique({ where: { id: +id } });
+    if (!proba) throw new NotFoundException('Ilyen proba nem létezik');
+    return this.try({ answer: '' }, proba.feladatId, proba.csoportId, true);
+  }
+  async decline(id: number) {
+    const proba = await this.prisma.proba.findUnique({ where: { id: +id } });
+    if (!proba) throw new NotFoundException('Ilyen proba nem létezik');
+    await this.prisma.proba.update({ where: { id: +id }, data: { elutasitva: true } });
+    return { type: 'Siker' };
   }
 }
