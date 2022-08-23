@@ -48,6 +48,7 @@ model Feladat {
   megoldas String  @default("")
   maxProba Int     @default(3)
   qrId     Int
+  type     String  @default("text")
   qr       Qr      @relation(fields: [qrId], references: [id])
   proba    Proba[]
 }
