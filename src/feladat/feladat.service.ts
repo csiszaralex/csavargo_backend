@@ -65,6 +65,18 @@ export class FeladatService {
     if (!task) throw new NotFoundException('Ilyen feladat nem létezik');
     return task;
   }
+  async getProba(id: number) {
+    const proba = await this.prisma.proba.findUnique({ where: { id: +id } });
+    if (!proba) throw new NotFoundException('Ilyen proba nem létezik');
+    return proba;
+  }
+
+  async getPicture(id: number) {
+    const task = await this.getProba(id);
+    const feladat = await this.getFeladat(task.feladatId);
+    if (feladat.type !== 'file') throw new BadRequestException('Nem képfeladat');
+    return task.proba;
+  }
 
   async getAcceptable() {
     const attempts = await this.prisma.proba.findMany({
@@ -80,6 +92,7 @@ export class FeladatService {
         mikor: attempt.mikor,
         felId: attempt.feladat.id,
         csopId: attempt.csoport.id,
+        tipus: attempt.feladat.type,
         id: attempt.id,
       };
     });
