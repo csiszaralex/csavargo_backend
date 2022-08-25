@@ -5,6 +5,7 @@ import { CsoportModule } from './csoport/csoport.module';
 import { QrModule } from './qr/qr.module';
 import { QrcsoportModule } from './qrcsoport/qrcsoport.module';
 import { FeladatModule } from './feladat/feladat.module';
+import { HibaModule } from './hiba/hiba.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FeladatModule } from './feladat/feladat.module';
     QrModule,
     QrcsoportModule,
     FeladatModule,
+    HibaModule,
   ],
   controllers: [AppController],
   providers: [],
