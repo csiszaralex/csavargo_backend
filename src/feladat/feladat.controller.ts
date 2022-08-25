@@ -83,4 +83,10 @@ export class FeladatController {
   async decline(@Param('id') id: number) {
     return this.feladatService.decline(id);
   }
+
+  @UseGuards(AlexGuard)
+  @Get('positions')
+  async getPositions() {
+    return this.feladatService.getPositions();
+  }
 }

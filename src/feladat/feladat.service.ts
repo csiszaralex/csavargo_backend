@@ -77,6 +77,47 @@ export class FeladatService {
     if (feladat.type !== 'file') throw new BadRequestException('Nem képfeladat');
     return task.proba;
   }
+  async getPositions() {
+    const csoportok = await this.prisma.csoport.findMany({
+      where: { osztaly: { not: 'admin' } },
+      include: { Proba: true, QrCsoport: true },
+    });
+    const utolsok = [];
+    for (const csoport of csoportok) {
+      const probaMikor = csoport.Proba.sort((a, b) => {
+        return b.mikor.getTime() - a.mikor.getTime();
+      });
+      const qrMikor = csoport.QrCsoport.sort((a, b) => {
+        return b.mikor.getTime() - a.mikor.getTime();
+      });
+      const proba = probaMikor.length > 0 ? probaMikor[0] : null;
+      const qr = qrMikor.length > 0 ? qrMikor[0] : null;
+
+      let utolso = { mikor: new Date(0), hely: '', tipus: '' };
+      if (!proba && !qr) {
+        utolso = { mikor: new Date(0), hely: 'Jedlik', tipus: '-' };
+      } else if (!proba || proba.mikor < qr.mikor) {
+        utolso = {
+          tipus: 'qr',
+          mikor: qr.mikor,
+          hely: (await this.prisma.qr.findUnique({ where: { id: qr.qrId } })).hely,
+        };
+      } else {
+        const feladat = await this.getFeladat(proba.feladatId);
+        utolso = {
+          tipus: 'proba',
+          mikor: proba.mikor,
+          hely: (await this.prisma.qr.findUnique({ where: { id: feladat.qrId } })).hely,
+        };
+      }
+
+      utolsok.push({
+        csoport: `${csoport.osztaly} / ${csoport.csoport}`,
+        ...utolso,
+      });
+    }
+    return utolsok;
+  }
 
   async getAcceptable() {
     const attempts = await this.prisma.proba.findMany({
