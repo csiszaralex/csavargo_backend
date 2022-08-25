@@ -64,4 +64,8 @@ export class QrController {
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Qr> {
     return this.qrService.findOne(id);
   }
+  @Get('code/:code')
+  findOneByCode(@Param('code') code: string): Promise<Qr> {
+    return this.qrService.findOneByCode(code);
+  }
 }

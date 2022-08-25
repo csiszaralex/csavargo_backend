@@ -23,8 +23,13 @@ export class QrService {
     return this.prisma.qr.findMany();
   }
 
-  findOne(id: number): Promise<Qr> {
-    const qr = this.prisma.qr.findUnique({ where: { id } });
+  async findOne(id: number): Promise<Qr> {
+    const qr = await this.prisma.qr.findUnique({ where: { id } });
+    if (!qr) throw new NotFoundException('A kód nem létezik');
+    return qr;
+  }
+  async findOneByCode(code: string): Promise<Qr> {
+    const qr = await this.prisma.qr.findUnique({ where: { kod: code } });
     if (!qr) throw new NotFoundException('A kód nem létezik');
     return qr;
   }
@@ -54,7 +59,7 @@ export class QrService {
   }
 
   async update(id: number, createQrDto: CreateQrDto): Promise<Qr> {
-    const { ertek, hasznalhato, kod, lat, lng } = createQrDto;
+    const { ertek, hasznalhato, kod, lat, lng, hely } = createQrDto;
     const qr = await this.findOne(id);
     return this.prisma.qr.update({
       data: {
@@ -63,6 +68,7 @@ export class QrService {
         kod: kod || qr.kod,
         lat: lat || qr.lat,
         lng: lng || qr.lng,
+        hely: hely || qr.hely,
       },
       where: { id },
     });

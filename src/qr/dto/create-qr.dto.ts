@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateQrDto {
-  @IsNotEmpty()
   @ApiProperty({
     example: 'ValamiKod',
     description: 'A QR kód egyedi azonosítója, mely a QR-be van írva',
@@ -28,4 +27,8 @@ export class CreateQrDto {
     default: '0.0',
   })
   lng: number;
+
+  @IsNotEmpty()
+  @ApiProperty({ example: 'Győr', description: 'A QR hely' })
+  hely: string;
 }
