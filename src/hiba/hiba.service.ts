@@ -6,8 +6,8 @@ import { CreateHibaDto } from './dto/create-hiba.dto';
 export class HibaService {
   constructor(private prisma: PrismaService) {}
 
-  create(createHibaDto: CreateHibaDto) {
+  create(createHibaDto: CreateHibaDto, ip: string, ua: string) {
     const { eloidezes, leiras, link } = createHibaDto;
-    return this.prisma.hiba.create({ data: { eloidezes, leiras, link } });
+    return this.prisma.hiba.create({ data: { eloidezes, leiras, link, ip, ua } });
   }
 }

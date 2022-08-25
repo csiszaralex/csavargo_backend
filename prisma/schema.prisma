@@ -66,11 +66,13 @@ model Proba {
 }
 
 model Hiba {
-  id Int @id @default(autoincrement())
-  link String
-  leiras String
-  eloidezes String @default("")
-  mikor DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  link      String
+  leiras    String
+  eloidezes String   @default("")
+  ip        String
+  ua        String
+  mikor     DateTime @default(now())
 }
 
 //TODO feladatok
