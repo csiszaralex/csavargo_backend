@@ -12,7 +12,7 @@ export class QrService {
   create(createQrDto: CreateQrDto): Promise<Qr> {
     const { ertek, hasznalhato, kod, lat, lng } = createQrDto;
     const QR = this.prisma.qr.findUnique({ where: { kod } });
-    if (QR) throw new NotFoundException('A QR kód már létezik');
+    if (QR) throw new NotFoundException('A kód már létezik');
     const qr = this.prisma.qr.create({
       data: { ertek: +ertek, hasznalhato: +hasznalhato, kod, lat, lng },
     });
@@ -25,7 +25,7 @@ export class QrService {
 
   findOne(id: number): Promise<Qr> {
     const qr = this.prisma.qr.findUnique({ where: { id } });
-    if (!qr) throw new NotFoundException('A QR kód nem létezik');
+    if (!qr) throw new NotFoundException('A kód nem létezik');
     return qr;
   }
 
@@ -38,7 +38,7 @@ export class QrService {
       where: { kod: code },
       select: { hasznalhato: true, id: true },
     });
-    if (!qr) throw new NotFoundException('A QR kód nem létezik');
+    if (!qr) throw new NotFoundException('A kód nem létezik');
     const { hasznalhato, id } = qr;
     const hasznalt = await this.prisma.qrCsoport.findMany({ where: { qrId: id } });
     const myCsop = await this.prisma.csoport.findUnique({ where: { id: csopId } });

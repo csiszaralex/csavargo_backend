@@ -18,14 +18,14 @@ export class QrcsoportService {
     });
     const qrek = await this.prisma.qrCsoport.findMany({ where: { qrId: qr.id } });
 
-    if (!csoport || !qr) throw new BadRequestException('A QR kód nem létezik');
-    if (!qr.enabled) throw new BadRequestException('A QR kód nem aktív');
+    if (!csoport || !qr) throw new BadRequestException('A kód nem létezik');
+    if (!qr.enabled) throw new BadRequestException('A kód nem aktív');
     if (qrek.length >= qr.hasznalhato)
-      throw new BadRequestException('A QR kód már elérte a maximális használatok számát');
+      throw new BadRequestException('A kód már elérte a maximális használatok számát');
     for (const j of osztaly) {
       for (const i of j.QrCsoport) {
         if (i.qrId === qr.id)
-          throw new BadRequestException('A QR kód már hozzá van rendelve az osztályhoz');
+          throw new BadRequestException('A kód már hozzá van rendelve az osztályhoz');
       }
     }
 
