@@ -80,4 +80,29 @@ export class QrService {
     qr = await this.prisma.qr.findUnique({ where: { id } });
     return qr;
   }
+
+  async runOut() {
+    const qrs = await this.prisma.qr.findMany({
+      include: { QrCsoport: true },
+    });
+    return qrs
+      .map(qr => {
+        return {
+          id: qr.id,
+          ertek: qr.ertek,
+          hasznalhato: qr.hasznalhato,
+          maradt: qr.hasznalhato - qr.QrCsoport.length,
+          hely: qr.hely,
+        };
+      })
+      .filter(qr => qr.maradt <= 2)
+      .sort((a, b) => b.maradt - a.maradt);
+  }
+  async increaseQr(id: number) {
+    const qr = await this.findOne(id);
+    return this.prisma.qr.update({
+      data: { hasznalhato: qr.hasznalhato + 1 },
+      where: { id },
+    });
+  }
 }

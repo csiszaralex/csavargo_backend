@@ -20,11 +20,6 @@ export class QrController {
     return this.qrService.findAll();
   }
 
-  @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Qr> {
-    return this.qrService.findOne(id);
-  }
-
   @UseGuards(JustAuthGuard)
   @Post('/available')
   available(
@@ -52,5 +47,21 @@ export class QrController {
   @Post('/disable/:id')
   disable(@Param('id', ParseIntPipe) id: number): Promise<Qr> {
     return this.qrService.disable(id);
+  }
+
+  @UseGuards(AlexGuard)
+  @Get('/runout')
+  async runOut() {
+    return this.qrService.runOut();
+  }
+  @UseGuards(AlexGuard)
+  @Get('/increase/:id')
+  increaseQr(@Param('id', ParseIntPipe) id: number) {
+    this.qrService.increaseQr(id);
+  }
+
+  @Get('/:id')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Qr> {
+    return this.qrService.findOne(id);
   }
 }
