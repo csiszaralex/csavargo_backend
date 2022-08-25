@@ -5,7 +5,6 @@ import { JwtPayloadInterface } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { SignInPayloadInterface } from './interfaces/signin-payload.interface';
 import { Csoport } from '@prisma/client';
-import internal from 'stream';
 
 @Injectable()
 export class CsoportService {
