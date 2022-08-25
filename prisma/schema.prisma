@@ -65,5 +65,13 @@ model Proba {
   feladat    Feladat  @relation(fields: [feladatId], references: [id])
 }
 
+model Hiba {
+  id Int @id @default(autoincrement())
+  link String
+  leiras String
+  eloidezes String @default("")
+  mikor DateTime @default(now())
+}
+
 //TODO feladatok
 //TODO comment QR-hez
